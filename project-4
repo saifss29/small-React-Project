@@ -1,1 +1,177 @@
+import React, { useState } from "react";
+import ExpenseForm from "./components/ExpenseForm";
+import ExpenseList from "./components/ExpenseList";
+
+const App = () => {
+  const [activityData, setActivityData] = useState([
+    {
+      id: 1,
+      name: "breakfast",
+      amount: 5,
+      category: "food",
+    },
+    {
+      id: 2,
+      name: "game",
+      amount: 10,
+      category: "Entertainment",
+    },
+  ]);
+  const deleteExpense = (idToDelete) => {
+    const updateExpense = activityData.filter((data) => {
+      return data.id !== idToDelete;
+    });
+    setActivityData(updateExpense);
+  };
+  const totalExpense = activityData.reduce((total, activity) => {
+    return total + activity.amount;
+  }, 0);
+  return (
+    <div className="min-h-screen bg-slate-900 text-white p-6">
+      <div className="max-w-xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Expense Tracker</h1>
+        <ExpenseForm setActivityData={setActivityData} />
+        <p className="text-xl font-semibold mb-4 text-emerald-400">
+          Total Expenses: ${totalExpense}
+        </p>
+        <ExpenseList
+          activityData={activityData}
+          deleteExpense={deleteExpense}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+
+
+
+
+
+
+import React, { useState } from "react";
+
+const ExpenseForm = ({ setActivityData }) => {
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (name.trim() === "") {
+      return;
+    }
+    if (parseFloat(amount) <= 0) {
+      return;
+    }
+    if (category.trim() === "") {
+      return;
+    }
+    const newExpense = {
+      id: Date.now(),
+      name: name,
+      amount: parseFloat(amount),
+      category: category,
+    };
+    setActivityData((oldData) => {
+      return [...oldData, newExpense];
+    });
+    setName("");
+    setAmount("");
+    setCategory("");
+  };
+
+  return (
+    <div className="flex flex-col gap-3 mb-6">
+      <form onSubmit={handleSubmit}>
+        <input
+          className="border border-gray-300 rounded-md p-2"
+          type="text"
+          placeholder="Enter Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          className="border border-gray-300 rounded-md p-2"
+          type="number"
+          placeholder="Enter Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <input
+          className="border border-gray-300 rounded-md p-2"
+          type="text"
+          placeholder="Enter Category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Add Expense
+        </button>{" "}
+      </form>
+    </div>
+  );
+};
+
+export default ExpenseForm;
+
+
+
+
+
+import React from "react";
+
+const ExpenseItem = ({ activity, deleteExpense }) => {
+  return (
+    <div className="border border-gray-300 rounded-lg p-4 mb-3">
+      <h1>ExpenseItem</h1>
+      <p className="text-lg font-semibold">{activity.name}</p>{" "}
+      <p className="text-xl font-bold mb-2">${activity.amount}</p>{" "}
+      <p className="text-sm text-gray-500 mb-2">
+        Category: {activity.category}
+      </p>{" "}
+      <button
+        onClick={() => deleteExpense(activity.id)}
+        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+      >
+        Delete
+      </button>
+    </div>
+  );
+};
+
+export default ExpenseItem;
+
+
+
+
+import React from "react";
+import ExpenseItem from "./ExpenseItem";
+
+const ExpenseList = ({ activityData, deleteExpense }) => {
+  return (
+    <div className="mt-6">
+      <h2 className="text-2xl font-bold mb-4">Your Expenses</h2>
+      {activityData.length === 0 ? (
+        <p>No expenses yet.</p>
+      ) : (
+        activityData.map((activity) => {
+          return (
+            <ExpenseItem
+              key={activity.id}
+              activity={activity}
+              deleteExpense={deleteExpense}
+            />
+          );
+        })
+      )}
+    </div>
+  );
+};
+
+export default ExpenseList;
 
