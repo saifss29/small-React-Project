@@ -1,1 +1,144 @@
+import React, { useState } from "react";
+
+const App = () => {
+  const [products, setProducts] = useState([]);
+  const [productName, setProductName] = useState("");
+  const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [error, setError] = useState("");
+  const [category, setCategory] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const addProduct = () => {
+    if (productName === "" || price === "" || quantity === "") {
+      setError("Please fill in all Fields");
+      return;
+    }
+    if (editingId !== null) {
+      const updatedProducts = products.map((product) => {
+        if (product.id === editingId) {
+          return {
+            ...product,
+            name: productName,
+            price: price,
+            quantity: quantity,
+            category: category,
+          };
+        }
+
+        return product;
+      });
+
+      setProducts(updatedProducts);
+      setEditingId(null);
+      return;
+    }
+    const newProduct = {
+      id: Date.now(),
+      name: productName,
+      price: price,
+      quantity: quantity,
+      category: category,
+    };
+
+    setProducts([...products, newProduct]);
+    setError("");
+    setProductName("");
+    setPrice("");
+    setQuantity("");
+    setCategory("");
+  };
+  const deleteProduct = (idTODelete) => {
+    const updateProduct = products.filter((data) => {
+      return data.id !== idTODelete;
+    });
+    setProducts(updateProduct);
+  };
+  const editProduct = (idToEdit) => {
+    setEditingId(idToEdit);
+    const productToEdit = products.find((product) => {
+      return product.id === idToEdit;
+    });
+    setProductName(productToEdit.name);
+    setPrice(productToEdit.price);
+    setCategory(productToEdit.category);
+    setQuantity(productToEdit.quantity);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        Inventory Manager
+      </h1>
+      <div className="flex gap-2 flex-wrap">
+        <input
+          className="border border-gray-300 rounded-lg p-2 flex-1"
+          type="text"
+          placeholder="Product Name"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+        />
+        <input
+          className="border border-gray-300 rounded-lg p-2 flex-1"
+          type="number"
+          placeholder="Price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+        <input
+          className="border border-gray-300 rounded-lg p-2 flex-1"
+          type="number"
+          placeholder="Quantity"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+        />
+        <input
+          className="border border-gray-300 rounded-lg p-2 flex-1"
+          type="text"
+          placeholder="Category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
+      </div>
+      {error && <p className="text-red-500 font-medium mb-4">{error}</p>}
+
+      <button
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-4"
+        onClick={addProduct}
+      >
+        Add Product
+      </button>
+      <div className="mt-8">
+        {products.map((product, index) => (
+          <p
+            key={product.id}
+            className="bg-white p-4 rounded-lg shadow-md mb-4"
+          >
+            {product.name}
+            <br />${product.price}
+            <br />
+            {product.quantity}
+            <br />
+            {product.category}
+            <br />
+            <button
+              className="bg-yellow-500 text-white px-3 py-1 rounded-lg mr-2 hover:bg-yellow-600"
+              onClick={() => editProduct(product.id)}
+            >
+              Edit
+            </button>
+            <br />
+            <button
+              className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600"
+              onClick={() => deleteProduct(product.id)}
+            >
+              Delete
+            </button>
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default App;
 
